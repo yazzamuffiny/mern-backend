@@ -3,6 +3,8 @@
 //require dotenv and invoke it
 require('dotenv').config();
 
+const cors = require('cors')
+
 // bring in express
 const express = require('express');
 
@@ -18,7 +20,7 @@ const mongoose = require('mongoose');
 //import routes
 const workoutRoutes = require('./routes/workouts')
 
-app.use(express.json()) //looks for body in the request,  will parse i and attaches it to req object
+app.use(express.json(), cors()); //looks for body in the request,  will parse i and attaches it to req object
 
 //log out path and method of each request
 app.use((req, res, next) => {

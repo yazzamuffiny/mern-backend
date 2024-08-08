@@ -60,9 +60,11 @@ const updateWorkout = async (req, res) => {
     //fins a work by its id and if it finds it,
     //spread out the properties anc change what it receives,
     //from the request body eg it could be title changed or everything
-    const workout = await Workout.findOneAndUpdate({_id: id}, {
-        ...req.body //... spreads out the properties of req body, basically creates a new object literal to be changed
-    });
+    const workout = await Workout.findOneAndUpdate(
+        {_id: id}, 
+        {...req.body},
+        {new: true}
+    );
 
     //if it cant find a workout by a valid id
     if(!workout) {
