@@ -19,6 +19,11 @@ const getWorkout = async (req, res) => {
     //set id variable
     const {id} = req.params
 
+    // check if id is valid mongo id
+    if(!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({error: 'No such workout'});
+    }
+
     //check if mongo id is valid
     const workout = await Workout.findById(id);
 
@@ -90,7 +95,7 @@ const deleteWorkout = async (req, res) => {
         res.status(404).json({error: "No such Workout"})
     }
     //return that the workout is found
-    res.status(200).json(workout + ' successfully deleted');
+    res.status(200).json(workout);
 }
 
 module.exports = {

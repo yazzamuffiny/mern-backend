@@ -19,6 +19,7 @@ const mongoose = require('mongoose');
 
 //import routes
 const workoutRoutes = require('./routes/workouts')
+const userRoutes = require('./routes/user')
 
 app.use(express.json(), cors()); //looks for body in the request,  will parse i and attaches it to req object
 
@@ -29,7 +30,8 @@ app.use((req, res, next) => {
 });
 
 //attach route to the app
-app.use('/api/workouts/', workoutRoutes) //attaches all routes to app
+app.use('/api/workouts/', workoutRoutes) //attaches all workout to app
+app.use('/api/user', userRoutes)
 
 //pull username and password from env
 const mongoUsername = process.env.MONGODB_USERNAME
