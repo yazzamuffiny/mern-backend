@@ -19,7 +19,18 @@ const workoutSchema = new Schema({
     load: {
         type: Number,
         required: true
-    }
+    },
+    user_id: {
+        type: String,
+        required: true
+    },
+    
+    comments: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: 'Comment'
+        }
+    ]
 }, {timestamps: true});
 
                     //creating model called Workout, use workoutSchema as the rules

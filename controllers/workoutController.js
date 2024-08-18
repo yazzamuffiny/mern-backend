@@ -8,43 +8,53 @@ const mongoose = require('mongoose')
 
 //define getWorkouts function
 const getWorkouts = async (req, res) => {
-//-1 in sort will put them on descending order (latest first)
-    const workouts = await Workout.find({}).sort({createdAt: -1})
-    //status of 200, sending workouts to json
-    res.status(200).json(workouts)
+    try {
+        const workouts = await Workout.find({}).populate({
+            path:'comments',
+            model: 'Comment'
+        }).sort({createdAt: -1});
+        res.status(200).json(workouts)
+    } catch (error) {
+        console.error(error)
+        res.status(500).json({error: 'Internal Server Error'})
+    }
 }
 
 //define get single workout function
 const getWorkout = async (req, res) => {
-    //set id variable
-    const {id} = req.params
 
-    // check if id is valid mongo id
-    if(!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({error: 'No such workout'});
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({ error: 'No such Workout: Id invalid' });
     }
 
-    //check if mongo id is valid
-    const workout = await Workout.findById(id);
+    try {
+        // Find the workout by ID and populate the 'comments' array with actual comment documents
+        const workout = await Workout.findById(id).populate({
+            path: 'comments',
+            model: 'Comment' // Reference the Comment model
+        });
 
-    //if not workout found show an error
-    if(!workout) {
-        return res.status(404).json({error: 'No such Workout'});
+        if (!workout) {
+            return res.status(404).json({ error: 'No such Workout: Workout does not exist' });
+        }
+
+        res.status(200).json(workout);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal server error' });
     }
-
-    //otherwise if workout is found return this
-    res.status(200).json(workout);
-
 }
 
 
 //define create workouts function
 const createWorkout = async (req, res) => {
-    const {title, load, reps} = req.body
+    const {title, load, reps, user_id} = req.body
 
     //add doc to DB
     try {
-        const workout = await Workout.create({title, load, reps})
+        const workout = await Workout.create({title, load, reps, user_id})
         res.status(200).json(workout)
     }
 
