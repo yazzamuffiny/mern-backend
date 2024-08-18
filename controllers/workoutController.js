@@ -1,5 +1,6 @@
 //what to do at this specific route
 
+const { response } = require('express')
 //variable for Workout from workoutModel
 const Workout = require('../models/workoutModel');
 
@@ -52,9 +53,18 @@ const getWorkout = async (req, res) => {
 const createWorkout = async (req, res) => {
     const {title, load, reps, user_id} = req.body
 
+    //get uploaded image filename from the req.file object
+    const imageFilename = req.file ? req.file.filename : null;
+
     //add doc to DB
     try {
-        const workout = await Workout.create({title, load, reps, user_id})
+        const workout = await Workout.create({
+            title, 
+            load, 
+            reps, 
+            user_id,
+            image: imageFilename 
+        })
         res.status(200).json(workout)
     }
 

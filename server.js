@@ -34,6 +34,9 @@ app.use((req, res, next) => {
 app.use('/api/workouts/', workoutRoutes) //attaches all workout to app
 app.use('/api/user', userRoutes)
 app.use('/api/comments', commentRoutes)
+//serve static files from public/uploads
+
+app.use('/public/uploads', express.static('public/uploads'))
 
 //pull username and password from env
 const mongoUsername = process.env.MONGODB_USERNAME
