@@ -74,7 +74,7 @@ const deleteComment = async (req, res) => {
             return res.status(404).json({ error: 'Workout not found' })
         }
 
-        const comment = await Comment.findByIdAndRemove(commentId)
+        const comment = await Comment.findByIdAndDelete(commentId)
 
         if (!comment) {
             return res.status(404).json({ error: 'Comment not found'})
