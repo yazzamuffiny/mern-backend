@@ -1,11 +1,14 @@
 //what to do at this specific route
 
 const { response } = require('express')
+
 //variable for Workout from workoutModel
 const Workout = require('../models/workoutModel');
 
 //import mongoose
 const mongoose = require('mongoose')
+
+const { cloudinary } = require('../config/cloudinary');
 
 //define getWorkouts function
 const getWorkouts = async (req, res) => {
@@ -54,7 +57,7 @@ const createWorkout = async (req, res) => {
     const {title, load, reps, user_id} = req.body
 
     //get uploaded image filename from the req.file object
-    const imageFilename = req.file ? req.file.filename : null;
+    const imageURL = req.file ? req.file.path : null;
 
     //add doc to DB
     try {
@@ -63,7 +66,7 @@ const createWorkout = async (req, res) => {
             load, 
             reps, 
             user_id,
-            image: imageFilename 
+            image: imageURL 
         })
         res.status(200).json(workout)
     }
@@ -102,19 +105,29 @@ const updateWorkout = async (req, res) => {
 
 //define delete workout function
 const deleteWorkout = async (req, res) => {
-    //set up the id variable
-    const {id} = req.params
-    //check the id is real
-    if(!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({error: 'No such Workout'})
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(404).json({ error: 'No such workout' });
     }
-    //find and delete a workout where the id on mongo is equal to the id in the request parameter
-    const workout = await Workout.findOneAndDelete({_id: id})
-    //if workout doesn't exist, show and error message
-    if(!workout) {
-        res.status(404).json({error: "No such Workout"})
+
+    const workout = await Workout.findOneAndDelete({ _id: id });
+
+    if (!workout) {
+        return res.status(404).json({ error: 'No such workout' });
     }
-    //return that the workout is found
+
+    // If workout has an associated image, delete it from Cloudinary
+ 
+    if (workout.image) {
+        // Extract the part after 'upload/' and before the file extension
+        const urlParts = workout.image.split('/');
+        const versionIndex = urlParts.findIndex(part => part.startsWith('v')); // Find the version segment
+        const publicId = urlParts.slice(versionIndex + 1).join('/').split('.')[0]; // Extract public ID after the version
+    
+        await cloudinary.uploader.destroy(publicId);
+    }
+
     res.status(200).json(workout);
 }
 
